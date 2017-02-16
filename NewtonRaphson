@@ -1,0 +1,83 @@
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+#include <windows.h>
+#define MAX_ITERACIONES 300
+#define INTERVALOS 6
+
+//Pude entender con la ayuda de mi compañera Dafne me explicó los métodos.
+
+using namespace std;
+
+double f(double x);
+double derivada(double x);
+void newtonRaphson(double x0, double tolerancia, int max_iteraciones);
+
+int main(){
+
+double tolerancia;
+double x0;
+
+
+
+
+cout << "Ingrese x0=";
+cin >> x0;
+
+cout << "Tolerancia del error dada= ";
+cin >> tolerancia;
+
+newtonRaphson(x0, tolerancia, MAX_ITERACIONES);
+
+cin.get();
+cin.get();
+return 0;
+}
+
+double f(double x){
+return abs(x);
+//f(x)=ln(x)/x
+}
+
+double derivada(double x){
+return x/abs(x);
+}
+void newtonRaphson(double x0, double tolerancia, int max_iteraciones){
+double x1;
+double error;
+int iteracion;
+bool converge = true;
+
+
+
+iteracion = 1;
+
+do {
+    if (iteracion>max_iteraciones){
+            converge = false;
+            break;
+    }else {
+        x1 = x0 - f(x0) / derivada(x0);
+        error = fabs(x1 - x0);
+
+        cout << "\a";
+        Sleep(500);
+
+        if(error <= tolerancia){
+            converge = true;
+            break;
+        }else{
+            x0 = x1;
+            iteracion++;
+        }
+    }
+} while (1);
+
+cout << "\n";
+Sleep(500);
+if(converge){
+    cout << "\n\n tolerancia de " << tolerancia << " la Raiz de f es = " << x1 << " Con "<<iteracion<<" de iteraciones"<<endl;
+
+}
+
+}
