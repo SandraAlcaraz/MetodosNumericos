@@ -1,0 +1,54 @@
+//Metodo de la secante
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+#include <windows.h>
+
+using namespace std;
+
+double evaluar(double x){
+    double a=log(x)/x;
+    return a;
+}
+double secante(double x0, double x1, double error){
+    double x2, fx0, fx1, fx2;
+
+    if(fabs(evaluar(x0))<fabs(evaluar(x1))){
+        double aux = x0;
+         x0 = x1;
+         x1 = aux;
+    }
+    fx0 = evaluar( x0 );
+    fx1 = evaluar( x1 );
+
+    do{
+        x2 = x1 - ( fx1 * ( x0 - x1 ) ) / ( fx0 - fx1 );
+        fx2 = evaluar( x2 );
+        cout<<x2<<"\n";
+        x0 = x1;
+        x1 = x2;
+        fx0 = evaluar( x0 );
+        fx1 = evaluar( x1 );
+        fx2 = evaluar( x2 );
+    }while(fabs(fx2)>error);
+    return x2;
+
+}
+
+int main(){
+   cout << "\nCalculo de las raices de una funcion aplicando el metodo de la biseccion\n";
+   cout << "\nIngrese el intervalo inicial [x0,x1]:" << endl;
+
+   double x0, x1, tolerancia;
+
+   cout << "\nx0 = ";
+   cin >> x0;
+
+   cout << "x1 = ";
+   cin >> x1;
+
+   cout << "Tolerancia = ";
+   cin >> tolerancia;
+
+   secante(x0,x1,tolerancia);
+}
