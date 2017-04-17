@@ -1,61 +1,80 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+
+//Con la ayuda de Miguel Miranda
+
 using namespace std;
-int main() {
 
- 
-    double x, y, xy, xsq, avy, xMes, yMes, yPros, sr, st, n, i, a1, a0;
-    x = y = xy = xsq = avy = xMes = yMes = yPros = i = 0;
-    cout << "Write n: ";
-    cin >> n;
+void min_squares(vector<double> &x, vector<double> &y) {
+  double xs = 0.0, ys = 0.0, lnys = 0.0, xlnys = 0.0, xsq;
+  int n = x.size();
 
-    ifstream myX("xx.txt");
-    ifstream myY("yy.txt");
+  // Setup calculations
+  for (int i = 0; i < n; i++) {
+    xs += x[i];
+    ys += y[i];
+    lnys += log(y[i]);
+    xlnys += x[i] * log(y[i]);
+    xsq += pow(x[i], 2);
+  }
+  double xmean = xs / n;
+  double ymean = ys / n;
+  double lnymean = lnys / n;
 
-    // Loop to get a0 and a1
-    for(i; myX && myY && i < n; i++) {
-        double tx, ty;
-        myX >> tx;
-        myY >> ty;
-        cout << tx << " | " << ty << endl;
-        x += tx;
-        y += log(ty);
-        xy += tx*log(ty);
-        xsq += pow(tx, 2);
+  double a1 = (n * xlnys - xs * lnys) / (n * xsq - pow(xs, 2));
+  double a0 = lnymean - a1 * xmean;
 
-    }
+  cout << "EQUATION" << endl;
+  cout << "y = " << exp(a0) << "e^" << a1 << "x" << endl;
+  double st = 0.0, sr = 0.0;
+  for (int i = 0; i < n; i++) {
+    sr += pow(y[i] - exp(a0) * exp(a1 * x[i]), 2);
+    st += pow(y[i] - ymean, 2);
+  }
 
+  // Standard error
+  double serr = sqrt(sr / (n - 2));
+  cout << "STANDARD ERROR" << endl;
+  cout << serr << endl;
+  // Determination coefficient
+  double r = sqrt((st - sr) / st);
+  cout << "CORRELATION COEFFICIENT" << endl;
+  cout << r << endl;
+  cout << "DETERMINATION COEFFICIENT" << endl;
+  cout << pow(r, 2) << endl;
+}
 
-    myX.close();
-    myY.close();
+int main(int argc, char *argv[]) {
+  if (argc != 3) {
+    cerr << "This method receives two files containing values of x and y respectively." << endl;
+  }
+  ifstream file_x;
+  ifstream file_y;
+  file_x.open("xx.txt");
+  file_y.open("yy.txt");
 
-    // Get alpha (a0) and beta (a1)
-    a1 = (n*xy - x*y)/(n*xsq - pow(x, 2));
-    avy = y/n;
-    a0 = exp(avy - a1*(x/n));
+  if (file_x.is_open() & file_y.is_open()) {
+      vector<double> x, y;
+      while (!file_x.eof() && !file_y.eof()) {
+        x.push_back(0);
+        file_x >> x[x.size() - 1];
+        y.push_back(0);
+        file_y >> y[y.size() - 1];
+      }
+      x.pop_back();
+      y.pop_back();
+      file_x.close();
+      file_y.close();
 
-    ifstream myErrX("x.txt");
-    ifstream myErrY("y.txt");
+      min_squares(x, y);
+  }
+  else {
+    cerr << "Problem with the file. Cannot be opened" << endl;
+  }
 
-    // Loop to get errors
-    for(int i = 0; i < n; i++) {
-        myErrY >> yMes;
-        myErrX >> xMes;
-        yPros = a0*exp(a1*xMes);
-        sr += pow(yMes - yPros, 2);
-        st += pow(yMes - avy, 2);
-    }
-
-    myErrX.close();
-    myErrY.close();
-
-    // Get Std. Error and Correlation Coef (r)
-    double stdError = sqrt(sr/(n-2));
-    double r = sqrt((st-sr)/st);
-
-    cout << "beta = " << a1 << "\t teta = " << a0 << endl;
-    cout << "funcion es igual a teta * e^(beta * x)";
-    cout << "Std. Error = " << stdError << "\tCorrelation Coefficient = " << r << endl;
-
+  return 0;
 }
